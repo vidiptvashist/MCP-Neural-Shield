@@ -6,6 +6,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
   build-n-publish:
@@ -36,6 +37,4 @@ jobs:
     - name: Publish Distribution to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
-        user: __token__
-        password: ${{ secrets.PYPI_API_TOKEN }}
         packages-dir: dist/
