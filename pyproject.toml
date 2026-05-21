@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mcp-vector-shield"
-version = "0.2.0"
+version = "0.2.1"
 description = "A neural network-powered security middleware and reverse proxy for the Model Context Protocol (MCP). Detects tool poisoning, shadowing, and prompt injection attacks using deep learning classifiers trained on SentenceTransformer embeddings."
 readme = "README.md"
 requires-python = ">=3.9"
