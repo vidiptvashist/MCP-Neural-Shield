@@ -1,6 +1,6 @@
 import os
 import json
-from mcp_vector_shield.mcp_classifier_engine import MCPNeuralShield
+from mcp_neural_shield.mcp_classifier_engine import MCPNeuralShield
 
 def main():
     print("=" * 70)
@@ -25,7 +25,7 @@ def main():
     
     # Suppress verbose warnings to ensure clean summary logs
     import logging
-    logging.getLogger("mcp_vector_shield").setLevel(logging.ERROR)
+    logging.getLogger("mcp_neural_shield").setLevel(logging.ERROR)
     
     # Test case A: Identical Tools (should be safe/benign)
     identical_count = 0

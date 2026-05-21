@@ -2,10 +2,10 @@ import os
 import time
 import json
 import logging
-from mcp_vector_shield.mcp_classifier_engine import MCPNeuralShield
+from mcp_neural_shield.mcp_classifier_engine import MCPNeuralShield
 
 # Suppress logging to ensure clean stdout summary prints
-logging.getLogger("mcp_vector_shield").setLevel(logging.ERROR)
+logging.getLogger("mcp_neural_shield").setLevel(logging.ERROR)
 
 def main():
     print("=" * 80)

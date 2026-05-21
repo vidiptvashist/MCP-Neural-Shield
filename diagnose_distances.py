@@ -4,7 +4,7 @@ os.environ["MKL_NUM_THREADS"] = "1"
 
 import json
 import numpy as np
-from mcp_vector_shield.mcp_registry import MCPSemanticRegistry
+from mcp_neural_shield.mcp_registry import MCPSemanticRegistry
 
 def main():
     registry = MCPSemanticRegistry(distance_threshold=0.3, device="cpu")

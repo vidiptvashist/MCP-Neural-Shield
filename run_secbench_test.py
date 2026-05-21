@@ -4,7 +4,7 @@ os.environ["OMP_NUM_THREADS"] = "1"
 os.environ["MKL_NUM_THREADS"] = "1"
 
 import json
-from mcp_vector_shield.mcp_classifier_engine import MCPNeuralShield
+from mcp_neural_shield.mcp_classifier_engine import MCPNeuralShield
 
 def main():
     print("=" * 80)

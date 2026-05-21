@@ -4,9 +4,9 @@ import httpx
 import logging
 from fastapi import FastAPI, Request, Response
 from fastapi.responses import StreamingResponse
-from mcp_vector_shield.middleware import MCPVectorShieldMiddleware
+from mcp_neural_shield.middleware import MCPVectorShieldMiddleware
 
-logger = logging.getLogger("mcp_vector_shield")
+logger = logging.getLogger("mcp_neural_shield")
 
 # Read target upstream server config from environment
 UPSTREAM_URL = os.getenv("MCP_UPSTREAM_URL", "http://localhost:8000").rstrip("/")
@@ -14,7 +14,7 @@ BLOCK_MODE = os.getenv("MCP_BLOCK_MODE", "false").lower() in ("true", "1", "yes"
 USE_HTTP_403 = os.getenv("MCP_USE_HTTP_403", "false").lower() in ("true", "1", "yes")
 
 app = FastAPI(
-    title="MCP Vector Shield Proxy",
+    title="MCP Neural Shield Proxy",
     description="A security proxy for filtering Model Context Protocol (MCP) JSON-RPC tools metadata.",
 )
 

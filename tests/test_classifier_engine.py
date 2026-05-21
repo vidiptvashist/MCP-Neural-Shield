@@ -1,7 +1,7 @@
 import pytest
 import os
 import time
-from mcp_vector_shield.mcp_classifier_engine import MCPNeuralShield
+from mcp_neural_shield.mcp_classifier_engine import MCPNeuralShield
 
 def test_neural_shield_initialization():
     """

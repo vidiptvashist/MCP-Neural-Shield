@@ -1,6 +1,6 @@
 import logging
 
-logger = logging.getLogger("mcp_vector_shield")
+logger = logging.getLogger("mcp_neural_shield")
 
 
 def verify_tool_metadata(tool_schema: dict) -> bool:

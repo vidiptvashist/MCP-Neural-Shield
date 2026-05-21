@@ -1,4 +1,4 @@
-from mcp_vector_shield.mcp_registry import MCPSemanticRegistry
+from mcp_neural_shield.mcp_registry import MCPSemanticRegistry
 
 
 def test_registry_initialization():

@@ -11,7 +11,7 @@ import torch
 from typing import Optional
 from sentence_transformers import SentenceTransformer
 
-logger = logging.getLogger("mcp_vector_shield")
+logger = logging.getLogger("mcp_neural_shield")
 
 
 class MCPSemanticRegistry:

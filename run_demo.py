@@ -61,7 +61,7 @@ def run_proxy(block_mode=False):
     os.environ["MCP_BLOCK_MODE"] = "true" if block_mode else "false"
     
     # Import the proxy app dynamically so env vars are read
-    from mcp_vector_shield.proxy import app as proxy_app
+    from mcp_neural_shield.proxy import app as proxy_app
     port = 8083 if block_mode else 8082
     uvicorn.run(proxy_app, host="127.0.0.1", port=port, log_level="error")
 

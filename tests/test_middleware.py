@@ -4,8 +4,8 @@ from fastapi import FastAPI
 from fastapi.responses import StreamingResponse, JSONResponse
 from httpx import AsyncClient, ASGITransport
 
-from mcp_vector_shield.middleware import MCPVectorShieldMiddleware, ShieldMiddleware
-from mcp_vector_shield.mcp_registry import MCPSemanticRegistry
+from mcp_neural_shield.middleware import MCPVectorShieldMiddleware, ShieldMiddleware
+from mcp_neural_shield.mcp_registry import MCPSemanticRegistry
 
 # Mock payloads
 MOCK_TOOLS_RESPONSE = {

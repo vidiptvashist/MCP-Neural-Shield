@@ -8,7 +8,7 @@ from typing import Optional
 from collections import OrderedDict
 from sentence_transformers import SentenceTransformer
 
-logger = logging.getLogger("mcp_vector_shield")
+logger = logging.getLogger("mcp_neural_shield")
 
 # -----------------------------------------------------------------------------
 # 1. PyTorch Model Architecture (Identical to train_classifier.py)

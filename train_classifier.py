@@ -293,7 +293,7 @@ def _generate_diverse_safe_augmentation():
 # -----------------------------------------------------------------------------
 def main():
     print("=" * 80)
-    print("           mcp-vector-shield: Neural Network Classifier Training            ")
+    print("           mcp-neural-shield: Neural Network Classifier Training            ")
     print("=" * 80)
 
     # A. Check and select device

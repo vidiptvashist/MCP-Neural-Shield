@@ -9,7 +9,7 @@ from typing import List, Dict, Any, Tuple
 os.environ["OMP_NUM_THREADS"] = "1"
 os.environ["MKL_NUM_THREADS"] = "1"
 
-from mcp_vector_shield.mcp_classifier_engine import MCPNeuralShield
+from mcp_neural_shield.mcp_classifier_engine import MCPNeuralShield
 
 class ComprehensiveBenchmark:
     def __init__(self):

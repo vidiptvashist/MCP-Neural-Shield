@@ -30,20 +30,20 @@ Version `0.2.0` introduces a generalized **Neural Network Classifier (`MCPNeural
 ## Installation & Onboarding
 
 ### Option 1: Standard Installation from PyPI
-Once published, install `mcp-vector-shield` with `pip`:
+Once published, install `mcp-neural-shield` with `pip`:
 ```bash
-pip install mcp-vector-shield
+pip install mcp-neural-shield
 ```
 
 ### Option 2: Direct Installation from GitHub
 Install the package directly from your GitHub repository:
 ```bash
-pip install git+https://github.com/vidiptvashist/mcp-vector-shield.git
+pip install git+https://github.com/vidiptvashist/mcp-neural-shield.git
 ```
 
 ### Option 3: Local Package Installation (For Testing)
 ```bash
-pip install ./dist/mcp_vector_shield-0.2.0-py3-none-any.whl
+pip install ./dist/mcp_neural_shield-0.2.0-py3-none-any.whl
 ```
 
 ---
@@ -96,8 +96,8 @@ If you are building your own custom MCP server in Python using `FastMCP`, you ca
 
 ```python
 from mcp.server.fastmcp import FastMCP
-from mcp_vector_shield.middleware import ShieldMiddleware
-from mcp_vector_shield.mcp_classifier_engine import MCPNeuralShield
+from mcp_neural_shield.middleware import ShieldMiddleware
+from mcp_neural_shield.mcp_classifier_engine import MCPNeuralShield
 
 # 1. Initialize server
 mcp = FastMCP("MySecureServer")
@@ -124,7 +124,7 @@ if __name__ == "__main__":
 For ASGI-based FastAPI HTTP or SSE integrations:
 ```python
 from fastapi import FastAPI
-from mcp_vector_shield.middleware import MCPVectorShieldMiddleware
+from mcp_neural_shield.middleware import MCPVectorShieldMiddleware
 
 app = FastAPI()
 
@@ -140,7 +140,7 @@ app.add_middleware(
 You can load the `MCPNeuralShield` directly in your code for standalone tool validation:
 
 ```python
-from mcp_vector_shield.mcp_classifier_engine import MCPNeuralShield
+from mcp_neural_shield.mcp_classifier_engine import MCPNeuralShield
 
 # Initialize Neural Shield
 shield = MCPNeuralShield(model_path="shield_model.pt", threshold=0.5)
@@ -178,7 +178,7 @@ print("Poisoned tool attack detected?", shield.is_attack(poisoned_tool))  # True
 
 ## Default Verification Rules
 
-In addition to the deep-learning classifier, a deterministic static verification hook (`mcp_vector_shield/verify.py`) blocks tools that:
+In addition to the deep-learning classifier, a deterministic static verification hook (`mcp_neural_shield/verify.py`) blocks tools that:
 1. Are missing a name.
 2. Contain unsafe keywords in their names (e.g. `exec`, `shell`, `eval`, `system`, `run_cmd`, `sh`, `bash`).
 3. Contain unsafe intent descriptions (e.g. `execute arbitrary`, `run shell`, `eval python`, `system command`).

@@ -3,7 +3,7 @@ import codecs
 import logging
 from typing import Callable, Optional, Any
 
-logger = logging.getLogger("mcp_vector_shield")
+logger = logging.getLogger("mcp_neural_shield")
 
 
 class ShieldMiddleware:
@@ -26,7 +26,7 @@ class ShieldMiddleware:
         """
         self.block_mode = block_mode
         if registry is None:
-            from mcp_vector_shield.mcp_classifier_engine import MCPNeuralShield
+            from mcp_neural_shield.mcp_classifier_engine import MCPNeuralShield
 
             self.registry = MCPNeuralShield()
         else:
@@ -92,7 +92,7 @@ class MCPVectorShieldMiddleware:
         """
         :param app: The ASGI application.
         :param verify_hook: Callable that accepts a tool schema dict and returns a boolean (True if safe, False if unsafe).
-                            Defaults to the verification hook in mcp_vector_shield.verify.
+                            Defaults to the verification hook in mcp_neural_shield.verify.
         :param block_mode: If True, blocks the entire response when an unsafe tool is found.
                            If False, strips the unsafe tool from the tools array but allows the rest through.
         :param use_http_403_for_block: If True and block_mode is True, returns an HTTP 403 Forbidden.
@@ -100,7 +100,7 @@ class MCPVectorShieldMiddleware:
         """
         self.app = app
         if verify_hook is None:
-            from mcp_vector_shield.verify import verify_tool_metadata
+            from mcp_neural_shield.verify import verify_tool_metadata
 
             self.verify_hook = verify_tool_metadata
         else:

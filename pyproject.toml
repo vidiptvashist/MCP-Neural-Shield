@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mcp-neural-shield"
-version = "0.2.2"
+version = "0.2.3"
 description = "A neural network-powered security middleware and reverse proxy for the Model Context Protocol (MCP). Detects tool poisoning, shadowing, and prompt injection attacks using deep learning classifiers trained on SentenceTransformer embeddings."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -45,19 +45,19 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/vidiptvashist/mcp-vector-shield"
-Repository = "https://github.com/vidiptvashist/mcp-vector-shield.git"
-"Bug Tracker" = "https://github.com/vidiptvashist/mcp-vector-shield/issues"
+Homepage = "https://github.com/vidiptvashist/mcp-neural-shield"
+Repository = "https://github.com/vidiptvashist/mcp-neural-shield.git"
+"Bug Tracker" = "https://github.com/vidiptvashist/mcp-neural-shield/issues"
 
 [project.scripts]
-mcp-shield = "mcp_vector_shield.cli:main"
+mcp-shield = "mcp_neural_shield.cli:main"
 mcp-shield-benchmark = "run_comprehensive_benchmark:main"
 
 [tool.setuptools]
-packages = ["mcp_vector_shield"]
+packages = ["mcp_neural_shield"]
 
 [tool.setuptools.package-data]
-mcp_vector_shield = ["shield_model.pt"]
+mcp_neural_shield = ["shield_model.pt"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "strict"

@@ -5,7 +5,7 @@ import argparse
 import asyncio
 import logging
 from typing import List
-from mcp_vector_shield.verify import verify_tool_metadata
+from mcp_neural_shield.verify import verify_tool_metadata
 
 # Pre-initialize environment thread patching for Apple Silicon optimization
 os.environ["OMP_NUM_THREADS"] = "1"
@@ -249,7 +249,7 @@ async def run_proxy(
     baseline_path: str = None,
 ):
     # 1. Initialize Neural Shield and blocked tools tracker
-    from mcp_vector_shield.mcp_classifier_engine import MCPNeuralShield
+    from mcp_neural_shield.mcp_classifier_engine import MCPNeuralShield
 
     model_display = model_path or '(bundled)'
     logger.info(f"Initializing MCPNeuralShield (model: '{model_display}', threshold: {threshold})...")
