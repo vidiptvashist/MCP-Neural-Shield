@@ -173,3 +173,10 @@ class MCPSemanticRegistry:
             return True
 
         return False
+
+    def is_attack(self, tool_schema: dict) -> bool:
+        """
+        Alias for is_shadowing_attack to support unified middleware interfaces.
+        """
+        return self.is_shadowing_attack(tool_schema)
+

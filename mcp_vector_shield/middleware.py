@@ -9,8 +9,8 @@ logger = logging.getLogger("mcp_vector_shield")
 class ShieldMiddleware:
     """
     Native MCP Middleware for the Python `FastMCP` framework.
-    Intercepts tools list definitions and validates them against the MCPSemanticRegistry
-    to block or filter out shadowing attacks (name-squatting, malicious revisions) in-flight.
+    Intercepts tools list definitions and validates them against the MCPNeuralShield
+    classifier to block or filter out poisoning/shadowing attacks in-flight.
     """
 
     def __init__(
@@ -19,15 +19,16 @@ class ShieldMiddleware:
         block_mode: bool = False,
     ):
         """
-        :param registry: An instance of `MCPSemanticRegistry`. If None, initializes a default instance.
+        :param registry: An instance of `MCPNeuralShield` or `MCPSemanticRegistry`.
+                         If None, initializes a default MCPNeuralShield instance.
         :param block_mode: If True, raises an exception/error to block the entire tools/list request when an attack is found.
                            If False, filters (strips) only the malicious tools and lets the safe ones through.
         """
         self.block_mode = block_mode
         if registry is None:
-            from mcp_vector_shield.mcp_registry import MCPSemanticRegistry
+            from mcp_vector_shield.mcp_classifier_engine import MCPNeuralShield
 
-            self.registry = MCPSemanticRegistry(distance_threshold=0.05)
+            self.registry = MCPNeuralShield()
         else:
             self.registry = registry
 
@@ -52,14 +53,14 @@ class ShieldMiddleware:
                     or {},
                 }
 
-                # Run shadowing attack detection using FAISS Registry
-                if self.registry.is_shadowing_attack(tool_schema):
+                # Run neural classifier attack detection
+                if self.registry.is_attack(tool_schema):
                     logger.warning(
-                        f"[ShieldMiddleware] Security Block: Tool '{tool.name}' is flagged as a SHADOWING ATTACK!"
+                        f"[ShieldMiddleware] Security Block: Tool '{tool.name}' flagged as ATTACK by neural classifier!"
                     )
                     if self.block_mode:
                         raise ValueError(
-                            f"Access Denied: Unsafe shadow tool modification detected on '{tool.name}'."
+                            f"Access Denied: Unsafe shadow tool or tool poisoning attack detected on '{tool.name}'."
                         )
                     continue
 

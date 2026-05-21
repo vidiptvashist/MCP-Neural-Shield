@@ -9,24 +9,20 @@ from typing import List, Dict, Any, Tuple
 os.environ["OMP_NUM_THREADS"] = "1"
 os.environ["MKL_NUM_THREADS"] = "1"
 
-from mcp_vector_shield.mcp_registry import MCPSemanticRegistry
-
-# Define calibrated threshold
-THRESHOLD = 0.05
-
+from mcp_vector_shield.mcp_classifier_engine import MCPNeuralShield
 
 class ComprehensiveBenchmark:
     def __init__(self):
         print("=" * 95)
         print(
-            "         MCPSecurity: Multi-Dataset Comprehensive Semantic Registry Benchmark        "
+            "         MCPSecurity: Multi-Dataset Comprehensive Neural Shield Classifier Benchmark        "
         )
         print("=" * 95)
 
-        # 1. Initialize standalone MCPSemanticRegistry
-        print("[1/5] Initializing MCPSemanticRegistry (Calibrated L2 threshold: 0.05)...")
-        self.registry = MCPSemanticRegistry(distance_threshold=THRESHOLD, device="cpu")
-        print(f"      Registry initialized successfully on device: {self.registry.device}")
+        # 1. Initialize MCPNeuralShield
+        print("[1/4] Initializing MCPNeuralShield (model: 'shield_model.pt')...")
+        self.registry = MCPNeuralShield(model_path="shield_model.pt", device="cpu")
+        print(f"      Neural Shield active on device: {self.registry.device}")
 
         # Thread pool executor for async CPU-bound inference scheduling
         cores = os.cpu_count() or 4
@@ -40,7 +36,7 @@ class ComprehensiveBenchmark:
         """
         Loads all three localized security datasets.
         """
-        print("\n[2/5] Ingesting localized benchmark JSON datasets...")
+        print("\n[2/4] Ingesting localized benchmark JSON datasets...")
 
         # A. MCPTox Dataset
         with open("safe_baselines.json", "r") as f:
@@ -67,81 +63,18 @@ class ComprehensiveBenchmark:
 
         return mcptox_baselines, mcptox_poisoned, secbench_shadow, toolbench_baselines
 
-    def register_baselines(
-        self,
-        mcptox_baselines: List[Dict[str, Any]],
-        toolbench_baselines: List[Dict[str, Any]],
-        secbench_shadow: List[Dict[str, Any]],
-    ):
+    async def _async_is_attack(self, tool: Dict[str, Any]) -> Tuple[bool, float]:
         """
-        Registers all clean, approved legitimate baselines into the FAISS index.
-        """
-        print("\n[3/5] Compiling and registering legitimate baselines into FAISS Index...")
-        start_time = time.time()
-
-        # Register MCPTox Baselines
-        for tool in mcptox_baselines:
-            self.registry.register_baseline(tool)
-
-        # Register MCPToolBench++ Baselines
-        for tool in toolbench_baselines:
-            self.registry.register_baseline(tool)
-
-        # Register MCPSecBench benign representations to evaluate shadowing deviation
-        benign_secbench_baselines = {
-            "g_search": "Performs Google queries to search public webpages and retrieve text summaries.",
-            "filesystem_read": "Reads the local contents of a file from the workspace directory sandboxed path safely.",
-            "fetch_url": "Fetches raw HTML pages or JSON API payloads from a specified web domain securely.",
-            "cve_2025_6541_trigger": "Triggers testing validations and sanity parameter checks safely on standard backend components.",
-            "exec_cmd": "Executes predefined benign system administration scripts and utilities on sandboxed resources.",
-            "sqlite_query": "Inspects structured databases and runs read-only queries against SQLite schemas safely.",
-            "mitm_proxy_tunnel": "Tunnels secure standard connection payloads across encrypted SSE ports.",
-            "dns_rebind_helper": "Resolves domain IP names and registers external DNS routing coordinates safely.",
-        }
-        for name, desc in benign_secbench_baselines.items():
-            self.registry.register_baseline(
-                {
-                    "name": name,
-                    "description": desc,
-                    "inputSchema": {
-                        "type": "object",
-                        "properties": {"payload": {"type": "string"}},
-                    },
-                }
-            )
-
-        # Register remaining generic MCPSecBench baseline items
-        for i in range(42):
-            vector_types = ["shadow_host", "cve_exploit", "exfiltration_channel", "mitm_injection"]
-            v_type = vector_types[i % len(vector_types)]
-            self.registry.register_baseline(
-                {
-                    "name": f"secbench_{v_type}_{i}",
-                    "description": f"Legitimate {v_type.replace('_', ' ')} testing utility to inspect network and host behaviors.",
-                    "inputSchema": {
-                        "type": "object",
-                        "properties": {"test_input": {"type": "string"}},
-                    },
-                }
-            )
-
-        duration = time.time() - start_time
-        print(
-            f"      Indexed {len(self.registry.tool_to_id)} authentic baselines in {duration:.3f} seconds."
-        )
-
-    async def _async_is_shadowing_attack(self, tool: Dict[str, Any]) -> Tuple[bool, float]:
-        """
-        Asynchronously runs is_shadowing_attack on the thread pool to avoid blocking the asyncio loop.
+        Asynchronously runs is_attack on the thread pool to avoid blocking the asyncio loop.
         """
         loop = asyncio.get_running_loop()
         start = time.time()
-        # Schedule the CPU-bound FAISS lookup on the thread pool
-        is_attack = await loop.run_in_executor(
-            self.executor, self.registry.is_shadowing_attack, tool
+        # Schedule the CPU-bound Neural inference lookup on the thread pool
+        is_atk = await loop.run_in_executor(
+            self.executor, self.registry.is_attack, tool
         )
         latency = (time.time() - start) * 1000  # Convert to ms
-        return is_attack, latency
+        return is_atk, latency
 
     async def evaluate_suite_async(
         self, name: str, tools: List[Dict[str, Any]], expected_attack: bool
@@ -150,10 +83,10 @@ class ComprehensiveBenchmark:
         Runs async batch processing over an entire dataset split and computes metrics.
         """
         print(f"      Batch evaluating: {name} ({len(tools)} items)...")
-        tasks = [self._async_is_shadowing_attack(tool) for tool in tools]
+        tasks = [self._async_is_attack(tool) for tool in tools]
         results = await asyncio.gather(*tasks)
 
-        flagged_count = sum(1 for is_attack, _ in results if is_attack)
+        flagged_count = sum(1 for is_atk, _ in results if is_atk)
         latencies = [latency for _, latency in results]
 
         avg_latency = sum(latencies) / len(latencies) if latencies else 0.0
@@ -184,11 +117,8 @@ async def main():
         benchmark.load_datasets()
     )
 
-    # 3. Register approved baselines
-    benchmark.register_baselines(mcptox_baselines, toolbench_baselines, secbench_shadow)
-
-    # 4. Sequentially execute comprehensive asynchronous evaluation splits
-    print("\n[4/5] Running asynchronous multi-dataset evaluation suites...")
+    # 3. Sequentially execute comprehensive asynchronous evaluation splits
+    print("\n[3/4] Running asynchronous multi-dataset evaluation suites...")
 
     # Suite A: MCPTox poisoned shadowing attacks (Expected: Attack)
     tox_poisoned_result = await benchmark.evaluate_suite_async(
@@ -219,8 +149,8 @@ async def main():
         "MCPToolBench++ (Legitimate Harmless Updates)", toolbench_updates, expected_attack=False
     )
 
-    # 5. Output Console LaTeX/Markdown Structured Report
-    print("\n[5/5] Compiling structured final benchmark summary report...")
+    # 4. Output Console LaTeX/Markdown Structured Report
+    print("\n[4/4] Compiling structured final benchmark summary report...")
     print("\n" + "=" * 105)
     print(
         "                                      FINAL SECURITY BENCHMARK REPORT                                    "
@@ -275,3 +205,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+

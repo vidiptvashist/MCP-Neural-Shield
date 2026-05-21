@@ -7,7 +7,7 @@ import logging
 from typing import List
 from mcp_vector_shield.verify import verify_tool_metadata
 
-# Pre-initialize environment thread patching for FAISS Apple Silicon optimization
+# Pre-initialize environment thread patching for Apple Silicon optimization
 os.environ["OMP_NUM_THREADS"] = "1"
 os.environ["MKL_NUM_THREADS"] = "1"
 
@@ -177,12 +177,12 @@ async def pipe_sub_to_stdout(
                                     or {},
                                 }
 
-                                is_malicious = not verify_tool_metadata(tool_schema)
-                                is_shadowed = registry.is_shadowing_attack(tool_schema)
+                                is_static_unsafe = not verify_tool_metadata(tool_schema)
+                                is_neural_attack = registry.is_attack(tool_schema)
 
-                                if is_malicious or is_shadowed:
+                                if is_static_unsafe or is_neural_attack:
                                     threat_desc = (
-                                        "Shadowing attack" if is_shadowed else "Malicious metadata"
+                                        "Neural classifier attack" if is_neural_attack else "Malicious metadata"
                                     )
                                     logger.warning(
                                         f"🚨 [Security Alert] {threat_desc} detected on tool '{tool.get('name')}'!"
@@ -243,33 +243,29 @@ async def pipe_sub_stderr(reader: asyncio.StreamReader):
 
 async def run_proxy(
     cmd_args: List[str],
-    baseline_path: str,
+    model_path: str,
     threshold: float,
     block_mode: bool,
+    baseline_path: str = None,
 ):
-    # 1. Initialize Semantic Registry and blocked tools tracker
-    from mcp_vector_shield.mcp_registry import MCPSemanticRegistry
+    # 1. Initialize Neural Shield and blocked tools tracker
+    from mcp_vector_shield.mcp_classifier_engine import MCPNeuralShield
 
-    registry = MCPSemanticRegistry(distance_threshold=threshold)
+    logger.info(f"Initializing MCPNeuralShield (model: '{model_path}', threshold: {threshold})...")
+    registry = MCPNeuralShield(model_path=model_path, threshold=threshold)
     blocked_tools = set()
 
-    # 2. Load and Register baseline tools
-    if os.path.exists(baseline_path):
+    # 2. Load baseline tools for backward compatibility (optional)
+    if baseline_path and os.path.exists(baseline_path):
         try:
             with open(baseline_path, "r") as f:
                 baselines = json.load(f)
             if isinstance(baselines, list):
-                logger.info(f"Loading {len(baselines)} baseline tools from '{baseline_path}'...")
+                logger.info(f"Registering {len(baselines)} baseline aliases from '{baseline_path}'...")
                 for tool in baselines:
                     registry.register_baseline(tool)
-            else:
-                logger.error(f"Invalid baseline format in '{baseline_path}' (expected JSON list).")
         except Exception as e:
             logger.error(f"Failed to load baseline file '{baseline_path}': {e}")
-    else:
-        logger.warning(
-            f"Baseline file '{baseline_path}' not found. Starting with empty baseline registry!"
-        )
 
     # 3. Spawn Subprocess Command
     logger.info(f"Spawning target MCP server: {' '.join(cmd_args)}")
@@ -312,20 +308,26 @@ async def run_proxy(
 
 def main():
     parser = argparse.ArgumentParser(
-        description="mcp-shield: Native stdio passthrough security proxy for Model Context Protocol (MCP)."
+        description="mcp-shield: Neural network-powered stdio passthrough security proxy for Model Context Protocol (MCP)."
+    )
+    parser.add_argument(
+        "--model",
+        "-m",
+        default="shield_model.pt",
+        help="Path to trained neural classifier weights (default: shield_model.pt)",
     )
     parser.add_argument(
         "--baseline",
         "-b",
-        default="safe_baselines.json",
-        help="Path to legitimate baseline tools JSON file (default: safe_baselines.json)",
+        default=None,
+        help="(Optional) Path to baseline tools JSON file for backward-compatible registry aliases.",
     )
     parser.add_argument(
         "--threshold",
         "-t",
         type=float,
-        default=0.05,
-        help="Semantic L2 distance calibration threshold (default: 0.05)",
+        default=0.5,
+        help="Neural classifier probability threshold (default: 0.5)",
     )
     parser.add_argument(
         "--block",
@@ -352,7 +354,7 @@ def main():
             file=sys.stderr,
         )
         print(
-            "Example: mcp-shield -b safe_baselines.json -- npx -y @modelcontextprotocol/server-github",
+            "Example: mcp-shield -m shield_model.pt -- npx -y @modelcontextprotocol/server-github",
             file=sys.stderr,
         )
         sys.exit(1)
@@ -361,9 +363,10 @@ def main():
         asyncio.run(
             run_proxy(
                 cmd_args=target_cmd,
-                baseline_path=args.baseline,
+                model_path=args.model,
                 threshold=args.threshold,
                 block_mode=args.block,
+                baseline_path=args.baseline,
             )
         )
     except KeyboardInterrupt:
