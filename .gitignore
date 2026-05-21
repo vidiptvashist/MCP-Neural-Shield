@@ -69,3 +69,4 @@ venv.bak/
 # Exclude massive local benchmark JSON files from git repository
 *.json
 !pyproject.toml
+article.md

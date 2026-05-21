@@ -3,14 +3,14 @@ requires = ["setuptools>=61.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "mcp-vector-shield"
-version = "0.2.1"
+name = "mcp-neural-shield"
+version = "0.2.2"
 description = "A neural network-powered security middleware and reverse proxy for the Model Context Protocol (MCP). Detects tool poisoning, shadowing, and prompt injection attacks using deep learning classifiers trained on SentenceTransformer embeddings."
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
 authors = [
-    { name = "Google DeepMind Advanced Agentic Coding Pair", email = "antigravity-aac@google.com" }
+    { name = "Vidipt Vashist", email = "vidipt.vashist@gmail.com" }
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
